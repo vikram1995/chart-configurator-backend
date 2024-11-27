@@ -1,10 +1,15 @@
 import express from "express";
-import { addChart, removeChart, updateChart } from "./chartController.js";
+import {
+  addChart,
+  getChart,
+  removeChart,
+  updateChart,
+} from "./chartController";
 
 const router = express.Router();
-
-router.post("/add", addChart);
-router.put("/update/:id", updateChart);
-router.delete("/remove/:id", removeChart);
+router.get("/", getChart);
+router.post("/", addChart);
+router.put("/:id", updateChart);
+router.delete("/:id", removeChart);
 
 export default router;

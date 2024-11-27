@@ -22,7 +22,7 @@ app.use(
 );
 
 // Routes
-app.use("api/chart", chartRoutes);
+app.use("/charts", chartRoutes);
 
 const PORT = 4000;
 app.listen(PORT, () => {

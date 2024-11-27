@@ -1,48 +1,100 @@
-export const addChart = async (req, res) => {
-  const { chartData } = req.body;
+import { Request, Response } from "express";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const chartsFilePath = path.join(__dirname, "charts.json");
+// Define the Chart interface
+interface Chart {
+  id: number;
+  title: string;
+  type: "line" | "bar";
+  yLabel?: string;
+  color: string;
+  dataSource: {
+    label: string;
+    value: string;
+  };
+}
+
+// Add Chart Function
+export const addChart = async (req: Request, res: Response): Promise<void> => {
+  const chartData = { ...req?.body };
 
   const filePath = path.join(__dirname, "charts.json");
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err && err.code === "ENOENT") {
       // If the file doesn't exist, initialize with an empty array
-      const initialData = [];
+      const initialData: Chart[] = [];
       saveDataToFile(initialData);
     } else if (err) {
-      return res.status(500).json({ error: "Failed to read file" });
+      res.status(500).json({ error: "Failed to read file" });
+      return;
     } else {
-      const currentData = JSON.parse(data);
+      const currentData: Chart[] = JSON.parse(data);
       currentData.push({ ...chartData, id: Date.now() });
       saveDataToFile(currentData);
     }
 
-    function saveDataToFile(data) {
+    function saveDataToFile(data: Chart[]) {
       fs.writeFile(filePath, JSON.stringify(data, null, 2), (err) => {
         if (err) {
-          return res.status(500).json({ error: "Failed to save data" });
+          res.status(500).json({ error: "Failed to save data" });
+        } else {
+          res
+            .status(200)
+            .json({ message: "Chart saved successfully!", charts: data });
         }
-        res.status(200).json({ message: "Chart saved successfully!" });
       });
     }
   });
 };
 
-export const updateChart = (req, res) => {
+// get all Charts
+
+export const getChart = (req: Request, res: Response) => {
+  fs.readFile(chartsFilePath, "utf8", (err, data) => {
+    if (err) {
+      if (err.code === "ENOENT") {
+        return res.status(404).json({ error: "Charts file not found" });
+      }
+      return res.status(500).json({ error: "Failed to read charts file" });
+    }
+
+    try {
+      const charts = JSON.parse(data || "[]");
+      res.status(200).json({ charts });
+    } catch (parseError) {
+      res.status(500).json({ error: "Failed to parse charts file" });
+    }
+  });
+};
+
+// Update Chart Function
+export const updateChart = (
+  req: Request<{ id: string }>,
+  res: Response
+): void => {
   const chartId = parseInt(req.params.id); // Get chart ID from URL params
-  const updatedChart = req.body; // Get updated chart data from request body
+  const updatedChart: Partial<Chart> = req.body; // Get updated chart data from request body
 
   const filePath = path.join(__dirname, "charts.json");
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
-      return res.status(500).json({ error: "Failed to read file" });
+      res.status(500).json({ error: "Failed to read file" });
+      return;
     }
 
-    const currentData = JSON.parse(data);
+    const currentData: Chart[] = JSON.parse(data);
     const chartIndex = currentData.findIndex((chart) => chart.id === chartId);
 
     if (chartIndex === -1) {
-      return res.status(404).json({ error: "Chart not found" });
+      res.status(404).json({ error: "Chart not found" });
+      return;
     }
 
     // Update the chart data
@@ -51,28 +103,38 @@ export const updateChart = (req, res) => {
     // Save the updated chart list back to the file
     fs.writeFile(filePath, JSON.stringify(currentData, null, 2), (err) => {
       if (err) {
-        return res.status(500).json({ error: "Failed to save data" });
+        res.status(500).json({ error: "Failed to save data" });
+      } else {
+        res.status(200).json({
+          message: "Chart updated successfully!",
+          charts: currentData,
+        });
       }
-      res.status(200).json({ message: "Chart updated successfully!" });
     });
   });
 };
 
-export const removeChart = (req, res) => {
+// Remove Chart Function
+export const removeChart = (
+  req: Request<{ id: string }>,
+  res: Response
+): void => {
   const chartId = parseInt(req.params.id); // Get chart ID from URL params
 
   const filePath = path.join(__dirname, "charts.json");
 
   fs.readFile(filePath, "utf8", (err, data) => {
     if (err) {
-      return res.status(500).json({ error: "Failed to read file" });
+      res.status(500).json({ error: "Failed to read file" });
+      return;
     }
 
-    const currentData = JSON.parse(data);
+    const currentData: Chart[] = JSON.parse(data);
     const chartIndex = currentData.findIndex((chart) => chart.id === chartId);
 
     if (chartIndex === -1) {
-      return res.status(404).json({ error: "Chart not found" });
+      res.status(404).json({ error: "Chart not found" });
+      return;
     }
 
     // Remove the chart
@@ -81,9 +143,13 @@ export const removeChart = (req, res) => {
     // Save the updated chart list back to the file
     fs.writeFile(filePath, JSON.stringify(currentData, null, 2), (err) => {
       if (err) {
-        return res.status(500).json({ error: "Failed to delete chart" });
+        res.status(500).json({ error: "Failed to delete chart" });
+      } else {
+        res.status(200).json({
+          message: "Chart deleted successfully!",
+          charts: currentData,
+        });
       }
-      res.status(200).json({ message: "Chart deleted successfully!" });
     });
   });
 };
