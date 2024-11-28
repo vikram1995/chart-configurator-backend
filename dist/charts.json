@@ -1,1 +1,86 @@
-[]
+[
+  {
+    "title": "Monthly Revenue Growth",
+    "type": "line",
+    "yLabel": "Revenue (in USD)",
+    "color": "#ff944d",
+    "dataSource": {
+      "label": "Business Expectations: Sales Revenue Growth",
+      "value": "ATLSBUSRGEP"
+    },
+    "timeFrequency": "1y",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795390892
+  },
+  {
+    "title": "Average Weekly Earnings",
+    "type": "line",
+    "yLabel": "Earnings (in USD)",
+    "color": "#3f6308",
+    "dataSource": {
+      "label": "Average Weekly Earnings of All Employees, Total Private",
+      "value": "CES0500000011"
+    },
+    "timeFrequency": "1y",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795455923
+  },
+  {
+    "title": "Product Sales Over Time",
+    "type": "bar",
+    "yLabel": "Units Sold",
+    "color": "#900c92",
+    "dataSource": {
+      "label": "Production, Sales, Work Started and Orders: Retail Trade Volume: Economic Activity: Retail Trade, Except of Motor Vehicles and Motorcycles for United States",
+      "value": "USASARTMISMEI"
+    },
+    "timeFrequency": "1y",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795546485
+  },
+  {
+    "title": "Inflation Trends",
+    "type": "bar",
+    "yLabel": "Inflation Rate (%)",
+    "color": "#97a90f",
+    "dataSource": {
+      "label": "Median Consumer Price Index",
+      "value": "MEDCPIM158SFRBCLE"
+    },
+    "timeFrequency": "1m",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795607204
+  },
+  {
+    "title": "Unemployment Rate by Year",
+    "type": "line",
+    "yLabel": "Unemployment Rate (%)",
+    "color": "#0e4477",
+    "dataSource": {
+      "label": "Unemployment Rate",
+      "value": "UNRATE"
+    },
+    "timeFrequency": "1y",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795773904
+  },
+  {
+    "title": "Stock Market Index Over Time",
+    "type": "line",
+    "yLabel": "Index Value",
+    "color": "#5c8b55",
+    "dataSource": {
+      "label": "Financial Market: Share Prices for United States",
+      "value": "SPASTT01USM661N"
+    },
+    "timeFrequency": "1y",
+    "lineStyle": "solid",
+    "barStyle": "medium",
+    "id": 1732795863318
+  }
+]
