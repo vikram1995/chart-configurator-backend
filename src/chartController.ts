@@ -19,6 +19,14 @@ interface Chart {
   };
 }
 
+// Define API Response structure
+interface PaginatedResponse {
+  charts: Chart[];
+  currentPage: number;
+  totalPages: number;
+  hasMore: boolean;
+}
+
 // Add Chart Function
 export const addChart = async (req: Request, res: Response): Promise<void> => {
   const chartData = { ...req?.body };
@@ -53,20 +61,43 @@ export const addChart = async (req: Request, res: Response): Promise<void> => {
   });
 };
 
-// get all Charts
+// Get Paginated Charts
+export const getChart = (req: Request, res: Response): void => {
+  const { page = "1", limit = "10" } = req.query; // Default to page 1, limit 10
+  const parsedPage = parseInt(page as string, 10);
+  const parsedLimit = parseInt(limit as string, 10);
 
-export const getChart = (req: Request, res: Response) => {
   fs.readFile(chartsFilePath, "utf8", (err, data) => {
     if (err) {
       if (err.code === "ENOENT") {
-        return res.status(404).json({ error: "Charts file not found" });
+        res.status(404).json({ error: "Charts file not found" });
+        return;
       }
-      return res.status(500).json({ error: "Failed to read charts file" });
+      res.status(500).json({ error: "Failed to read charts file" });
+      return;
     }
 
     try {
-      const charts = JSON.parse(data || "[]");
-      res.status(200).json({ charts });
+      const charts: Chart[] = JSON.parse(data || "[]");
+
+      // Calculate pagination indices
+      const startIndex = (parsedPage - 1) * parsedLimit;
+      const endIndex = startIndex + parsedLimit;
+
+      // Paginate results
+      const paginatedCharts = charts.slice(startIndex, endIndex);
+
+      // Determine if more data is available
+      const hasMore = endIndex < charts.length;
+
+      const response: PaginatedResponse = {
+        charts: paginatedCharts,
+        currentPage: parsedPage,
+        totalPages: Math.ceil(charts.length / parsedLimit),
+        hasMore,
+      };
+
+      res.status(200).json(response);
     } catch (parseError) {
       res.status(500).json({ error: "Failed to parse charts file" });
     }
